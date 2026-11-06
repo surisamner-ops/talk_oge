@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juliya Magic Teacher - OGE Speaking Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c084fc;
+            --primary-light: #e9d5ff;
+            --secondary: #60a5fa;
+            --success: #4ade80;
+            --success-bg: rgba(74, 222, 128, 0.15);
+            --warning: #fbbf24;
+            --warning-bg: rgba(251, 191, 36, 0.15);
+            --error: #f87171;
+            --error-bg: rgba(248, 113, 113, 0.15);
+            --bg-dark: #090a0f;
+            --bg-card: rgba(255, 255, 255, 0.04);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, var(--bg-dark) 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--duration) ease-in-out infinite; opacity: 0; }
+        .shooting-star { position: absolute; width: 150px; height: 2px; background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.8), transparent); animation: shoot 5s linear infinite; opacity: 0; }
+
+        .space-decor { position: fixed; pointer-events: none; z-index: 0; opacity: 0.12; }
+        .space-decor.planet { animation: float 12s ease-in-out infinite; }
+        .space-decor.rocket { animation: rocketFloat 8s ease-in-out infinite; }
+        .space-decor.small { opacity: 0.08; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
+        @keyframes rocketFloat { 0%, 100% { transform: translateY(0) rotate(-15deg); } 50% { transform: translateY(-30px) rotate(-10deg); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: var(--max-opacity); transform: scale(1.3); } }
+        @keyframes shoot { 0% { transform: translateX(-150px) translateY(150px) rotate(-45deg); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateX(100vw) translateY(-150px) rotate(-45deg); opacity: 0; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-red { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(248, 113, 113, 0); } }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+
+        .main-wrapper { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 60px 20px; }
+        .header { text-align: center; margin-bottom: 50px; animation: fadeInUp 1s ease-out; }
+        .main-title {
+            font-family: 'Comfortaa', cursive; font-size: 3em; font-weight: 700;
+            background: linear-gradient(90deg, #c084fc, #ffffff, #60a5fa, #c084fc, #ffffff);
+            background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 6s linear infinite; margin-bottom: 15px; position: relative; display: inline-block;
+        }
+        .header p { font-size: 1.15em; color: #c4b5fd; text-shadow: 0 0 20px rgba(192, 132, 252, 0.3); max-width: 700px; margin: 0 auto; }
+
+        .welcome-form, .task-section {
+            background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid rgba(192, 132, 252, 0.3);
+            border-radius: 24px; padding: 40px; text-align: center; max-width: 700px; margin: 0 auto 40px;
+            animation: fadeInUp 0.8s ease-out; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        .task-section { display: none; text-align: left; }
+        .task-section.show { display: block; }
+        
+        .section-title { font-family: 'Comfortaa', cursive; font-size: 1.8em; color: var(--primary-light); text-align: center; margin-bottom: 20px; }
+        .instruction { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 1.05em; line-height: 1.6; }
+
+        .name-input {
+            width: 100%; max-width: 320px; padding: 16px 24px; background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(192, 132, 252, 0.4); border-radius: 14px; color: #fff; font-size: 1.1em;
+            text-align: center; margin-bottom: 25px; font-family: 'Inter', sans-serif; transition: all 0.3s ease;
+        }
+        .name-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 25px rgba(192, 132, 252, 0.4); }
+
+        .btn-start, .btn-finish, .btn-action {
+            padding: 16px 45px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white; border: none; border-radius: 50px; font-family: 'Comfortaa', cursive; font-size: 1.1em;
+            font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(192, 132, 252, 0.4);
+            display: inline-block; margin: 10px;
+        }
+        .btn-start:hover, .btn-finish:hover, .btn-action:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 30px rgba(192, 132, 252, 0.6); }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-record {
+            background: linear-gradient(135deg, var(--error) 0%, #ef4444 100%);
+            box-shadow: 0 4px 20px rgba(248, 113, 113, 0.4);
+        }
+        .btn-record.recording { animation: pulse-red 1.5s infinite; }
+        .btn-stop { background: linear-gradient(135deg, #64748b 0%, #475569 100%); box-shadow: 0 4px 20px rgba(100, 116, 139, 0.4); }
+
+        .topic-card {
+            background: rgba(192, 132, 252, 0.08); border: 1.5px solid rgba(192, 132, 252, 0.3); border-radius: 16px;
+            padding: 25px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s ease; text-align: left;
+        }
+        .topic-card:hover { background: rgba(192, 132, 252, 0.2); border-color: var(--primary); transform: translateY(-3px); }
+        .topic-card.selected { background: rgba(74, 222, 128, 0.15); border-color: var(--success); }
+        .topic-card h3 { color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px; font-size: 1.2em; }
+        .topic-card ul { color: #cbd5e1; padding-left: 20px; font-size: 0.95em; line-height: 1.8; }
+
+        .timer-display {
+            font-family: 'Comfortaa', cursive; font-size: 3em; color: var(--primary-light); text-align: center;
+            margin: 20px 0; text-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
+        }
+        .timer-display.warning { color: var(--warning); text-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
+        .timer-display.danger { color: var(--error); text-shadow: 0 0 20px rgba(248, 113, 113, 0.5); }
+
+        .audio-player-wrapper {
+            margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 16px; display: none;
+        }
+        .audio-player-wrapper.show { display: block; animation: fadeInUp 0.5s ease; }
+        audio { width: 100%; margin-top: 10px; border-radius: 8px; }
+
+        .status-message {
+            text-align: center; margin-top: 20px; padding: 15px; border-radius: 12px; font-size: 1em; display: none;
+        }
+        .status-message.success { background: var(--success-bg); border: 1px solid var(--success); color: var(--success); display: block; }
+        .status-message.error { background: var(--error-bg); border: 1px solid var(--error); color: var(--error); display: block; }
+        .status-message.info { background: rgba(96, 165, 250, 0.15); border: 1px solid var(--secondary); color: var(--secondary); display: block; }
+
+        .back-to-main {
+            position: fixed; top: 30px; left: 30px; width: 55px; height: 55px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;
+            box-shadow: 0 0 25px rgba(192, 132, 252, 0.5); transition: all 0.3s ease; z-index: 100; font-size: 1.5em;
+        }
+        .back-to-main:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 0 35px rgba(192, 132, 252, 0.8); }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.2em; }
+            .task-section, .welcome-form { padding: 25px; }
+            .space-decor { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- SVG DECORATIONS -->
+    <svg class="space-decor planet" style="top: 8%; right: 5%; width: 120px; height: 120px;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="35" fill="#c084fc" opacity="0.6"/>
+        <ellipse cx="50" cy="50" rx="48" ry="10" fill="none" stroke="#e9d5ff" stroke-width="2" opacity="0.5" transform="rotate(-20 50 50)"/>
+    </svg>
+    <svg class="space-decor rocket" style="bottom: 15%; left: 3%; width: 80px; height: 120px; animation-delay: -3s;" viewBox="0 0 60 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30 5 L 45 35 L 45 70 L 30 80 L 15 70 L 15 35 Z" fill="#e9d5ff" opacity="0.7"/>
+        <path d="M 22 80 L 30 95 L 38 80 Z" fill="#fbbf24" opacity="0.7"/>
+    </svg>
+
+    <div class="main-wrapper">
+        <a href="index.html" class="back-to-main" title="Back to main page">←</a>
+        
+        <div class="header">
+            <h1 class="main-title">OGE Speaking Practice</h1>
+            <p>Запиши свой монолог по теме ОГЭ. Система оценит длительность и отправит аудио учителю в Teams. ✨</p>
+        </div>
+
+        <!-- STEP 1: Welcome -->
+        <div class="welcome-form" id="welcomeForm">
+            <h2 style="font-family: 'Comfortaa', cursive; color: var(--primary-light); margin-bottom: 15px;">Добро пожаловать!</h2>
+            <p style="color: #94a3b8; margin-bottom: 30px;">Введи своё имя и фамилию, чтобы начать</p>
+            <input type="text" class="name-input" id="studentName" placeholder="Например: Ivan Petrov">
+            <br>
+            <button class="btn-start" onclick="goToTopics()">Начать практику ✨</button>
+        </div>
+
+        <!-- STEP 2: Topic Selection -->
+        <div class="task-section" id="topicSection">
+            <h2 class="section-title">🎯 Шаг 1: Выбери тему</h2>
+            <p class="instruction">Нажми на карточку темы, которую хочешь раскрыть в монологе.</p>
+            <div id="topicsContainer"></div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-action" id="btnToPrep" disabled onclick="goToPreparation()">Перейти к подготовке ➡️</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Preparation -->
+        <div class="task-section" id="prepSection">
+            <h2 class="section-title">⏳ Шаг 2: Подготовка</h2>
+            <p class="instruction">У тебя есть 1.5 минуты, чтобы обдумать ответ и сделать заметки. <br>Тема: <b id="prepTopicTitle" style="color: var(--primary);"></b></p>
+            <div class="timer-display" id="prepTimer">01:30</div>
+            <div style="text-align: center;">
+                <button class="btn-action" onclick="skipPrep()">Я готов, начать запись 🎙️</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: Recording -->
+        <div class="task-section" id="recordSection">
+            <h2 class="section-title">🎙️ Шаг 3: Запись монолога</h2>
+            <p class="instruction">Говори чётко, раскрой все пункты плана. Максимальное время: 2 минуты.</p>
+            <div class="timer-display" id="recordTimer">00:00</div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <button class="btn-action btn-record" id="btnStartRecord" onclick="startRecording()">🔴 Начать запись</button>
+                <button class="btn-action btn-stop" id="btnStopRecord" onclick="stopRecording()" disabled>⏹️ Остановить</button>
+            </div>
+
+            <div class="status-message info" id="micStatus">
+                ℹ️ Нажми «Начать запись» и разреши доступ к микрофону в браузере.
+            </div>
+
+            <div class="audio-player-wrapper" id="audioPlayback">
+                <h3 style="color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px;">🎧 Прослушать себя:</h3>
+                <audio id="audioPlayer" controls></audio>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn-action" onclick="resetRecording()">🔄 Перезаписать</button>
+                    <button class="btn-finish" onclick="finishAndSend()">🚀 Отправить учителю</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: Sending Status -->
+        <div class="task-section" id="sendingSection" style="text-align: center;">
+            <h2 class="section-title">📤 Отправка результатов</h2>
+            <div class="status-message info" id="sendingStatus">Подготовка аудио и отправка в Teams...</div>
+            <div class="status-message success" id="sendSuccess" style="display: none;">
+                ✨ <b>Отлично отправлено!</b><br>Твой монолог и данные успешно получены учителем.
+            </div>
+            <div class="status-message error" id="sendError" style="display: none;">
+                ⚠️ <b>Ошибка отправки.</b> Проверь интернет или попробуй ещё раз.
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-action" onclick="location.reload()">Вернуться в начало</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- КОНФИГУРАЦИЯ ---
+        const POWER_AUTOMATE_URL = 'https://default50bef10a64ce4efab7ceef7facd9c8.97.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/04/workflows/80320cf3242145f38cf2a9fe697b1bcf/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pmVjt3_a2XgjEk7CxztVzXYwdUnHTs1Po59jq45gcyw';
+        
+        const ogeTopics = [
+            {
+                id: 1,
+                title: "Healthy Lifestyle",
+                plan: [
+                    "why it is important to keep fit",
+                    "what you do to stay healthy",
+                    "your attitude towards junk food"
+                ]
+            },
+            {
+                id: 2,
+                title: "School Life",
+                plan: [
+                    "your favorite subject and why",
+                    "how you prepare for exams",
+                    "your ideal school"
+                ]
+            },
+            {
+                id: 3,
+                title: "Travel",
+                plan: [
+                    "why people like traveling",
+                    "the best place you have visited",
+                    "your dream destination"
+                ]
+            }
+        ];
+
+        // --- ПЕРЕМЕННЫЕ СОСТОЯНИЯ ---
+        let studentName = '';
+        let selectedTopic = null;
+        let prepTimerInterval = null;
+        let recordTimerInterval = null;
+        let prepTimeLeft = 90; // 1.5 минуты
+        let recordTimeLeft = 0;
+        let maxRecordTime = 120; // 2 минуты максимум для ОГЭ
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioBlob = null;
+        let audioBase64 = '';
+        let micStream = null;
+
+        // --- ИНИЦИАЛИЗАЦИЯ ЗВЁЗД ---
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.setProperty('--duration', (Math.random() * 4 + 2) + 's');
+                star.style.setProperty('--max-opacity', Math.random() * 0.8 + 0.2);
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', createStars);
+
+        // --- НАВИГАЦИЯ ---
+        function showSection(id) {
+            document.querySelectorAll('.welcome-form, .task-section').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.welcome-form, .task-section').forEach(el => el.style.display = 'none');
+            const target = document.getElementById(id);
+            target.style.display = 'block';
+            setTimeout(() => target.classList.add('show'), 50);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToTopics() {
+            studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) {
+                const input = document.getElementById('studentName');
+                input.style.borderColor = 'var(--error)';
+                input.style.animation = 'shake 0.4s ease';
+                setTimeout(() => { input.style.borderColor = ''; input.style.animation = ''; }, 400);
+                alert('Пожалуйста, введи своё имя! 🌟');
+                return;
+            }
+            renderTopics();
+            showSection('topicSection');
+        }
+
+        function renderTopics() {
+            const container = document.getElementById('topicsContainer');
+            container.innerHTML = '';
+            ogeTopics.forEach(topic => {
+                const card = document.createElement('div');
+                card.className = 'topic-card';
+                card.innerHTML = `
+                    <h3>${topic.title}</h3>
+                    <ul>${topic.plan.map(point => `<li>${point}</li>`).join('')}</ul>
+                `;
+                card.onclick = () => selectTopic(topic, card);
+                container.appendChild(card);
+            });
+        }
+
+        function selectTopic(topic, cardElement) {
+            selectedTopic = topic;
+            document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            document.getElementById('btnToPrep').disabled = false;
+        }
+
+        function goToPreparation() {
+            document.getElementById('prepTopicTitle').textContent = selectedTopic.title;
+            showSection('prepSection');
+            startPrepTimer();
+        }
+
+        function skipPrep() {
+            clearInterval(prepTimerInterval);
+            showSection('recordSection');
+        }
+
+        // --- ТАЙМЕРЫ ---
+        function startPrepTimer() {
+            prepTimeLeft = 90;
+            updateTimerDisplay('prepTimer', prepTimeLeft);
+            prepTimerInterval = setInterval(() => {
+                prepTimeLeft--;
+                updateTimerDisplay('prepTimer', prepTimeLeft);
+                if (prepTimeLeft <= 0) {
+                    clearInterval(prepTimerInterval);
+                    skipPrep(); // Автоматический переход к записи
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(elementId, seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            const el = document.getElementById(elementId);
+            el.textContent = `${m}:${s}`;
+            
+            el.classList.remove('warning', 'danger');
+            if (elementId === 'recordTimer' && seconds >= 110) el.classList.add('danger');
+            else if (elementId === 'recordTimer' && seconds >= 90) el.classList.add('warning');
+        }
+
+        // --- ЗАПИСЬ АУДИО ---
+        async function startRecording() {
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(micStream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = audioUrl;
+                    
+                    // Конвертация в Base64 для отправки в Power Automate
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        audioBase64 = reader.result; // Содержит "data:audio/webm;base64,..."
+                    };
+
+                    document.getElementById('audioPlayback').classList.add('show');
+                    document.getElementById('micStatus').style.display = 'none';
+                };
+
+                mediaRecorder.start();
+                document.getElementById('btnStartRecord').disabled = true;
+                document.getElementById('btnStartRecord').classList.add('recording');
+                document.getElementById('btnStopRecord').disabled = false;
+                document.getElementById('micStatus').className = 'status-message success';
+                document.getElementById('micStatus').textContent = '🔴 Идёт запись... Говори чётко!';
+                document.getElementById('micStatus').style.display = 'block';
+
+                // Запуск таймера записи
+                recordTimeLeft = 0;
+                updateTimerDisplay('recordTimer', recordTimeLeft);
+                recordTimerInterval = setInterval(() => {
+                    recordTimeLeft++;
+                    updateTimerDisplay('recordTimer', recordTimeLeft);
+                    if (recordTimeLeft >= maxRecordTime) {
+                        stopRecording(); // Автоматическая остановка через 2 минуты
+                    }
+                }, 1000);
+
+            } catch (err) {
+                console.error('Ошибка доступа к микрофону:', err);
+                document.getElementById('micStatus').className = 'status-message error';
+                document.getElementById('micStatus').textContent = '❌ Не удалось получить доступ к микрофону. Проверь настройки браузера (разреши доступ к микрофону) и убедись, что сайт открыт по HTTPS.';
+                document.getElementById('micStatus').style.display = 'block';
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                micStream.getTracks().forEach(track => track.stop()); // Освобождаем микрофон
+            }
+            clearInterval(recordTimerInterval);
+            document.getElementById('btnStartRecord').disabled = false;
+            document.getElementById('btnStartRecord').classList.remove('recording');
+            document.getElementById('btnStopRecord').disabled = true;
+        }
+
+        function resetRecording() {
+            audioChunks = [];
+            audioBlob = null;
+            audioBase64 = '';
+            document.getElementById('audioPlayback').classList.remove('show');
+            document.getElementById('micStatus').className = 'status-message info';
+            document.getElementById('micStatus').textContent = 'ℹ️ Нажми «Начать запись» для новой попытки.';
+            document.getElementById('micStatus').style.display = 'block';
+            recordTimeLeft = 0;
+            updateTimerDisplay('recordTimer', recordTimeLeft);
+        }
+
+        // --- ОТПРАВКА ДАННЫХ ---
+        async function finishAndSend() {
+            if (!audioBase64) {
+                alert('Сначала запиши аудио! 🎙️');
+                return;
+            }
+
+            showSection('sendingSection');
+            const statusEl = document.getElementById('sendingStatus');
+            
+            try {
+                const payload = {
+                    student_name: studentName,
+                    exercise_name: "OGE Speaking Monologue",
+                    topic: selectedTopic.title,
+                    recording_duration_seconds: recordTimeLeft,
+                    max_duration_seconds: maxRecordTime,
+                    timestamp: new Date().toLocaleString('ru-RU'),
+                    audio_base64: audioBase64, // Внимание: может быть большим (~2-3 МБ), но Power Automate обычно принимает до 10 МБ
+                    audio_format: "webm"
+                };
+
+                // Отправка в Power Automate (Teams)
+                const response = await fetch(POWER_AUTOMATE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    statusEl.style.display = 'none';
+                    document.getElementById('sendSuccess').style.display = 'block';
+                } else {
+                    throw new Error('HTTP error ' + response.status);
+                }
+            } catch (error) {
+                console.error('Ошибка отправки:', error);
+                statusEl.style.display = 'none';
+                document.getElementById('sendError').style.display = 'block';
+                document.getElementById('sendError').innerHTML += `<br><small>${error.message}</small>`;
+            }
+        }
+    </script>
+</body>
+</html>
