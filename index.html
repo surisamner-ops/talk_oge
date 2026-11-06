@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juliya Magic Teacher - OGE Speaking Practice</title>
-    <!-- Подключаем библиотеку для записи напрямую в MP3 -->
-    <script src="https://cdn.jsdelivr.net/npm/mp3-mediarecorder@4.0.5/dist/mp3-mediarecorder.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -133,7 +131,7 @@
         
         <div class="header">
             <h1 class="main-title">OGE Speaking Practice</h1>
-            <p>Запиши монолог, скачай его в MP3 и получи предварительный анализ скрипта. Данные будут отправлены учителю в Teams. ✨</p>
+            <p>Запиши монолог, скачай аудио и получи предварительный анализ скрипта. Данные будут отправлены учителю в Teams. ✨</p>
         </div>
 
         <!-- STEP 1: Welcome -->
@@ -177,7 +175,7 @@
             </div>
 
             <div class="status-message info" id="micStatus">
-                ℹ️ Нажми «Начать запись» и разреши доступ к микрофону. (Требуется браузер Chrome/Edge и HTTPS)
+                ℹ️ Нажми «Начать запись» и разреши доступ к микрофону.
             </div>
 
             <div class="transcript-wrapper" id="transcriptWrapper">
@@ -187,10 +185,10 @@
             </div>
 
             <div class="audio-player-wrapper" id="audioPlayback">
-                <h3 style="color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px;">🎧 Твоя запись (MP3):</h3>
+                <h3 style="color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px;">🎧 Твоя запись:</h3>
                 <audio id="audioPlayer" controls></audio>
                 <div style="text-align: center; margin-top: 15px;">
-                    <a id="downloadMp3Btn" class="btn-action btn-secondary" style="font-size: 0.9em; padding: 12px 25px;">⬇️ Скачать MP3 файл</a>
+                    <a id="downloadBtn" class="btn-action btn-secondary" style="font-size: 0.9em; padding: 12px 25px;">⬇️ Скачать аудио файл</a>
                 </div>
                 <div style="text-align: center; margin-top: 20px;">
                     <button class="btn-action" onclick="resetRecording()">🔄 Перезаписать</button>
@@ -202,7 +200,7 @@
         <!-- STEP 5: Sending Status -->
         <div class="task-section" id="sendingSection" style="text-align: center;">
             <h2 class="section-title">📤 Отправка результатов</h2>
-            <div class="status-message info" id="sendingStatus">⏳ Подготовка MP3 и отправка скрипта с анализом в Teams...</div>
+            <div class="status-message info" id="sendingStatus">⏳ Подготовка аудио и отправка скрипта с анализом в Teams...</div>
             <div class="status-message success" id="sendSuccess" style="display: none;">
                 ✨ <b>Отлично отправлено!</b><br>Твой монолог, скрипт и анализ успешно получены учителем.
             </div>
@@ -216,7 +214,6 @@
     </div>
 
     <script>
-        // ВСТАВЬТЕ СЮДА ВАШ URL ИЗ POWER AUTOMATE
         const POWER_AUTOMATE_URL = 'https://default50bef10a64ce4efab7ceef7facd9c8.97.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/04/workflows/80320cf3242145f38cf2a9fe697b1bcf/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pmVjt3_a2XgjEk7CxztVzXYwdUnHTs1Po59jq45gcyw';
         
         const ogeTopics = [
@@ -231,7 +228,7 @@
         let recognition = null;
         let finalTranscript = '';
 
-        // Инициализация распознавания речи (работает в Chrome/Edge)
+        // Инициализация распознавания речи
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -345,8 +342,8 @@
             try {
                 micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                // Используем Mp3MediaRecorder вместо стандартного MediaRecorder для записи сразу в MP3
-                mediaRecorder = new Mp3MediaRecorder(micStream);
+                // Используем стандартный MediaRecorder (который работал)
+                mediaRecorder = new MediaRecorder(micStream);
                 audioChunks = [];
                 finalTranscript = '';
                 document.getElementById('transcriptBox').textContent = 'Слушаю...';
@@ -356,15 +353,15 @@
                 };
 
                 mediaRecorder.onstop = () => {
-                    audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     const audioUrl = URL.createObjectURL(audioBlob);
                     const audioPlayer = document.getElementById('audioPlayer');
                     audioPlayer.src = audioUrl;
                     
                     // Настройка кнопки скачивания
-                    const downloadBtn = document.getElementById('downloadMp3Btn');
+                    const downloadBtn = document.getElementById('downloadBtn');
                     downloadBtn.href = audioUrl;
-                    downloadBtn.download = `${studentName.replace(/\s+/g, '_')}_OGE_Speaking.mp3`;
+                    downloadBtn.download = `${studentName.replace(/\s+/g, '_')}_OGE_Speaking.webm`;
                     
                     const reader = new FileReader();
                     reader.readAsDataURL(audioBlob);
@@ -372,12 +369,12 @@
 
                     document.getElementById('audioPlayback').classList.add('show');
                     document.getElementById('micStatus').style.display = 'none';
-                    analyzePreliminary(); // Запуск анализа после остановки
+                    analyzePreliminary();
                 };
 
                 mediaRecorder.start();
                 
-                // Запуск распознавания речи, если доступно
+                // Запуск распознавания речи
                 if (recognition) {
                     try { recognition.start(); } catch(e) { console.log("Recognition already started"); }
                 }
@@ -433,7 +430,6 @@
             updateTimerDisplay('recordTimer', recordTimeLeft);
         }
 
-        // Предварительный анализ на стороне клиента
         function analyzePreliminary() {
             const text = finalTranscript.toLowerCase();
             const words = text.trim().split(/\s+/).filter(w => w.length > 0);
@@ -441,17 +437,14 @@
             const analysisBox = document.getElementById('preliminaryAnalysis');
             let issues = [];
 
-            // 1. Проверка длины (ОГЭ требует ~10-15 предложений, примерно 100-150 слов)
             if (wordCount < 80) issues.push("⚠️ <b>Малый объем:</b> Монолог слишком короткий (менее 80 слов). Постарайся раскрыть все пункты плана подробнее.");
             else if (wordCount > 200) issues.push("⚠️ <b>Превышение объема:</b> Монолог слишком длинный. Старайся укладываться в 10-15 предложений.");
 
-            // 2. Проверка ключевых слов темы
             const foundKeywords = selectedTopic.keywords.filter(kw => text.includes(kw));
             if (foundKeywords.length < 2) {
                 issues.push(`⚠️ <b>Лексика:</b> Не найдены ключевые слова темы. Попробуй использовать слова, связанные с темой "${selectedTopic.title}".`);
             }
 
-            // 3. Базовая проверка на частые ошибки (упрощенная)
             if (text.includes(" i ") && !text.includes(" i am ") && !text.includes(" i have ") && !text.includes(" i think ")) {
                 issues.push("💡 <b>Грамматика:</b> Проверь использование местоимения 'I'. Оно всегда пишется с большой буквы, а после него обычно идет глагол (I am, I think, I have).");
             }
@@ -482,8 +475,8 @@
                     timestamp: new Date().toLocaleString('ru-RU'),
                     transcript_text: finalTranscript.trim() || "Распознавание не удалось (возможно, браузер не поддерживает Web Speech API).",
                     preliminary_issues: document.getElementById('preliminaryAnalysis').innerText,
-                    audio_base64_mp3: audioBase64, // Полный Base64 MP3 файла
-                    audio_format: "mp3"
+                    audio_base64: audioBase64,
+                    audio_format: "webm"
                 };
 
                 const response = await fetch(POWER_AUTOMATE_URL, {
