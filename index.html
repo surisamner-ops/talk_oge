@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juliya Magic Teacher - OGE Speaking Practice</title>
+    <title>Juliya Magic Teacher - OGE Speaking: Environmental Problems</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -26,6 +26,7 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse-red { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(248, 113, 113, 0); } }
         @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 
         .main-wrapper { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 60px 20px; }
         .header { text-align: center; margin-bottom: 50px; animation: fadeInUp 1s ease-out; }
@@ -39,7 +40,7 @@
 
         .welcome-form, .task-section {
             background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid rgba(192, 132, 252, 0.3);
-            border-radius: 24px; padding: 40px; text-align: center; max-width: 700px; margin: 0 auto 40px;
+            border-radius: 24px; padding: 40px; text-align: center; max-width: 800px; margin: 0 auto 40px;
             animation: fadeInUp 0.8s ease-out; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         .task-section { display: none; text-align: left; }
@@ -70,15 +71,60 @@
         .btn-record.recording { animation: pulse-red 1.5s infinite; }
         .btn-stop { background: linear-gradient(135deg, #64748b 0%, #475569 100%); box-shadow: 0 4px 20px rgba(100, 116, 139, 0.4); }
 
-        .topic-card {
-            background: rgba(192, 132, 252, 0.08); border: 1.5px solid rgba(192, 132, 252, 0.3); border-radius: 16px;
-            padding: 25px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s ease; text-align: left;
+        /* Карточка задания ОГЭ */
+        .oge-task-card {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.1), rgba(96, 165, 250, 0.1));
+            border: 2px solid rgba(192, 132, 252, 0.4); border-radius: 20px; padding: 30px;
+            margin-bottom: 30px; text-align: left;
         }
-        .topic-card:hover { background: rgba(192, 132, 252, 0.2); border-color: var(--primary); transform: translateY(-3px); }
-        .topic-card.selected { background: rgba(74, 222, 128, 0.15); border-color: var(--success); }
-        .topic-card h3 { color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px; font-size: 1.2em; }
-        .topic-card ul { color: #cbd5e1; padding-left: 20px; font-size: 0.95em; line-height: 1.8; }
+        .oge-task-card h3 {
+            font-family: 'Comfortaa', cursive; color: var(--primary-light); font-size: 1.3em; margin-bottom: 15px;
+        }
+        .oge-task-card p { color: #e2e8f0; margin-bottom: 15px; line-height: 1.7; }
+        .oge-task-card ul { color: #cbd5e1; padding-left: 25px; margin-bottom: 15px; }
+        .oge-task-card ul li { margin-bottom: 8px; }
+        .oge-task-card .reminder {
+            background: rgba(251, 191, 36, 0.1); border-left: 4px solid var(--warning);
+            padding: 12px 15px; border-radius: 8px; color: #fcd34d; font-size: 0.95em;
+        }
 
+        /* Задание на вставку слов */
+        .monologue-text {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(192, 132, 252, 0.3);
+            border-radius: 16px; padding: 25px; line-height: 2; color: #e2e8f0;
+            font-size: 1.05em; text-align: left; margin-bottom: 25px;
+        }
+        .blank-input {
+            display: inline-block; width: 140px; padding: 4px 10px; margin: 0 5px;
+            background: rgba(192, 132, 252, 0.1); border: 2px dashed rgba(192, 132, 252, 0.5);
+            border-radius: 8px; color: #fff; font-family: 'Inter', sans-serif; font-size: 1em;
+            text-align: center; transition: all 0.3s ease;
+        }
+        .blank-input:focus { outline: none; border-color: var(--primary); background: rgba(192, 132, 252, 0.2); }
+        .blank-input.correct { border-color: var(--success); background: var(--success-bg); color: var(--success); border-style: solid; }
+        .blank-input.wrong { border-color: var(--error); background: var(--error-bg); color: var(--error); border-style: solid; animation: shake 0.4s ease; }
+
+        .word-bank {
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+            padding: 20px; background: rgba(192, 132, 252, 0.08); border: 2px dashed rgba(192, 132, 252, 0.3);
+            border-radius: 16px; margin-bottom: 25px;
+        }
+        .word-bank-item {
+            padding: 8px 16px; background: rgba(192, 132, 252, 0.2); border: 1px solid rgba(192, 132, 252, 0.4);
+            border-radius: 10px; color: var(--primary-light); font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; user-select: none;
+        }
+        .word-bank-item:hover { background: rgba(192, 132, 252, 0.4); transform: translateY(-2px); }
+        .word-bank-item.used { opacity: 0.3; text-decoration: line-through; cursor: not-allowed; }
+
+        .check-result {
+            text-align: center; padding: 15px; border-radius: 12px; margin-top: 20px;
+            font-size: 1.05em; display: none;
+        }
+        .check-result.success { background: var(--success-bg); border: 1px solid var(--success); color: var(--success); display: block; }
+        .check-result.error { background: var(--error-bg); border: 1px solid var(--error); color: var(--error); display: block; }
+
+        /* Таймер */
         .timer-display {
             font-family: 'Comfortaa', cursive; font-size: 3em; color: var(--primary-light); text-align: center;
             margin: 20px 0; text-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
@@ -86,6 +132,7 @@
         .timer-display.warning { color: var(--warning); text-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
         .timer-display.danger { color: var(--error); text-shadow: 0 0 20px rgba(248, 113, 113, 0.5); }
 
+        /* Аудио и транскрипт */
         .audio-player-wrapper, .transcript-wrapper {
             margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 16px; display: none;
         }
@@ -94,7 +141,7 @@
 
         .transcript-box {
             background: rgba(0,0,0,0.3); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 12px;
-            padding: 15px; min-height: 100px; color: #e2e8f0; font-size: 1.05em; line-height: 1.6;
+            padding: 15px; min-height: 80px; color: #e2e8f0; font-size: 1.05em; line-height: 1.6;
             text-align: left; white-space: pre-wrap;
         }
         .analysis-box {
@@ -120,6 +167,7 @@
         @media (max-width: 768px) {
             .main-title { font-size: 2.2em; }
             .task-section, .welcome-form { padding: 25px; }
+            .blank-input { width: 100px; }
         }
     </style>
 </head>
@@ -130,8 +178,8 @@
         <a href="index.html" class="back-to-main" title="Back to main page">←</a>
         
         <div class="header">
-            <h1 class="main-title">OGE Speaking Practice</h1>
-            <p>Запиши монолог, скачай аудио и получи предварительный анализ скрипта. Данные будут отправлены учителю в Teams. ✨</p>
+            <h1 class="main-title">OGE Speaking: Ecology</h1>
+            <p>Выполни два задания: вставь слова в монолог и запиши свой собственный монолог по теме «Environmental Problems». ✨</p>
         </div>
 
         <!-- STEP 1: Welcome -->
@@ -140,33 +188,51 @@
             <p style="color: #94a3b8; margin-bottom: 30px;">Введи своё имя и фамилию, чтобы начать</p>
             <input type="text" class="name-input" id="studentName" placeholder="Например: Ivan Petrov">
             <br>
-            <button class="btn-start" onclick="goToTopics()">Начать практику ✨</button>
+            <button class="btn-start" onclick="goToTask1()">Начать ✨</button>
         </div>
 
-        <!-- STEP 2: Topic Selection -->
-        <div class="task-section" id="topicSection">
-            <h2 class="section-title">🎯 Шаг 1: Выбери тему</h2>
-            <p class="instruction">Нажми на карточку темы, которую хочешь раскрыть в монологе.</p>
-            <div id="topicsContainer"></div>
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn-action" id="btnToPrep" disabled onclick="goToPreparation()">Перейти к подготовке ➡️</button>
-            </div>
-        </div>
-
-        <!-- STEP 3: Preparation -->
-        <div class="task-section" id="prepSection">
-            <h2 class="section-title">⏳ Шаг 2: Подготовка</h2>
-            <p class="instruction">У тебя есть 1.5 минуты, чтобы обдумать ответ. <br>Тема: <b id="prepTopicTitle" style="color: var(--primary);"></b></p>
-            <div class="timer-display" id="prepTimer">01:30</div>
+        <!-- STEP 2: Task 1 - Fill in the blanks -->
+        <div class="task-section" id="task1Section">
+            <h2 class="section-title">📝 Задание 1: Вставь пропущенные слова</h2>
+            <p class="instruction">Прочитай монолог и вставь подходящие по смыслу слова из списка ниже. Нажми на слово, затем на пропуск.</p>
+            
+            <div class="word-bank" id="wordBank"></div>
+            
+            <div class="monologue-text" id="monologueText"></div>
+            
             <div style="text-align: center;">
-                <button class="btn-action" onclick="skipPrep()">Я готов, начать запись 🎙️</button>
+                <button class="btn-action" onclick="checkBlanks()">✅ Проверить</button>
+                <button class="btn-action btn-secondary" onclick="resetBlanks()">🔄 Сбросить</button>
+            </div>
+            
+            <div class="check-result" id="checkResult"></div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-action" id="btnToTask2" disabled onclick="goToTask2()">Перейти к заданию 2 ➡️</button>
             </div>
         </div>
 
-        <!-- STEP 4: Recording -->
-        <div class="task-section" id="recordSection">
-            <h2 class="section-title">🎙️ Шаг 3: Запись монолога</h2>
-            <p class="instruction">Говори чётко. Максимальное время: 2 минуты. Текст будет распознаваться автоматически.</p>
+        <!-- STEP 3: Task 2 - OGE Speaking Task -->
+        <div class="task-section" id="task2Section">
+            <h2 class="section-title">🎙️ Задание 2: Запиши свой монолог</h2>
+            
+            <div class="oge-task-card">
+                <h3>📋 Задание ОГЭ</h3>
+                <p><b>You are going to give a talk about environmental problems.</b></p>
+                <ul>
+                    <li>why people worry about environmental problems nowadays;</li>
+                    <li>what the most serious environmental problem in the place where you live is;</li>
+                    <li>what young people can do to improve the ecological situation;</li>
+                    <li>what your attitude to environmental problems is.</li>
+                </ul>
+                <div class="reminder">
+                    ⏱️ You will have to start in 1.5 minutes and speak for not more than 2 minutes (10–12 sentences).<br>
+                    🗣️ Remember to say: <b>I am going to give a talk about environmental problems.</b><br>
+                    🔁 You have to talk continuously.
+                </div>
+            </div>
+
+            <p class="instruction">Подготовься и запиши свой монолог. Текст будет распознаваться автоматически.</p>
             <div class="timer-display" id="recordTimer">00:00</div>
             
             <div style="text-align: center; margin: 20px 0;">
@@ -179,7 +245,7 @@
             </div>
 
             <div class="transcript-wrapper" id="transcriptWrapper">
-                <h3 style="color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px;">📝 Живой скрипт:</h3>
+                <h3 style="color: var(--primary-light); font-family: 'Comfortaa', cursive; margin-bottom: 10px;">📝 Распознанный текст:</h3>
                 <div class="transcript-box" id="transcriptBox">Ожидание речи...</div>
                 <div class="analysis-box" id="preliminaryAnalysis" style="display: none;"></div>
             </div>
@@ -197,12 +263,12 @@
             </div>
         </div>
 
-        <!-- STEP 5: Sending Status -->
+        <!-- STEP 4: Sending Status -->
         <div class="task-section" id="sendingSection" style="text-align: center;">
             <h2 class="section-title">📤 Отправка результатов</h2>
-            <div class="status-message info" id="sendingStatus">⏳ Подготовка аудио и отправка скрипта с анализом в Teams...</div>
+            <div class="status-message info" id="sendingStatus">⏳ Подготовка аудио и отправка в Teams...</div>
             <div class="status-message success" id="sendSuccess" style="display: none;">
-                ✨ <b>Отлично отправлено!</b><br>Твой монолог, скрипт и анализ успешно получены учителем.
+                ✨ <b>Отлично отправлено!</b><br>Твои результаты успешно получены учителем.
             </div>
             <div class="status-message error" id="sendError" style="display: none;">
                 ⚠️ <b>Ошибка отправки.</b> Проверь интернет или попробуй ещё раз.
@@ -216,17 +282,42 @@
     <script>
         const POWER_AUTOMATE_URL = 'https://default50bef10a64ce4efab7ceef7facd9c8.97.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/04/workflows/80320cf3242145f38cf2a9fe697b1bcf/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pmVjt3_a2XgjEk7CxztVzXYwdUnHTs1Po59jq45gcyw';
         
-        const ogeTopics = [
-            { id: 1, title: "Healthy Lifestyle", keywords: ["fit", "healthy", "junk food", "sport", "diet"], plan: ["why it is important to keep fit", "what you do to stay healthy", "your attitude towards junk food"] },
-            { id: 2, title: "School Life", keywords: ["subject", "exams", "school", "teachers", "study"], plan: ["your favorite subject and why", "how you prepare for exams", "your ideal school"] },
-            { id: 3, title: "Travel", keywords: ["traveling", "visited", "destination", "country", "culture"], plan: ["why people like traveling", "the best place you have visited", "your dream destination"] }
-        ];
+        let studentName = '';
+        let task1Completed = false;
+        let selectedBlank = null;
 
-        let studentName = '', selectedTopic = null, prepTimerInterval = null, recordTimerInterval = null;
-        let prepTimeLeft = 90, recordTimeLeft = 0, maxRecordTime = 120;
+        // Данные для задания 1: монолог с пропусками
+        const monologueData = {
+            text: `I am going to give a talk about environmental problems.
+
+Environmental problems are becoming more and more important today. People begin to understand that climate changes, acid rains, pollution, deforestation can threaten their lives and the future of the planet. That's why a lot of us really care about ecology.
+
+As for my town, the main ecological problem in the place where I live is pollution. My town suffers from different kinds of pollution. To begin with, there is a lot of rubbish in the streets. Moreover, cars pollute the air, and a lot of waste is dumped into the rivers.
+
+In my opinion, young people can do a lot to improve the ecological situation if they become more active. They can join different local ecological projects. For example, they can plant trees and help to clean parks, forests and riverbanks.
+
+I believe that environmental problems are of great importance nowadays and I am sure that young people can do a lot to improve the ecological situation.
+That's all that I wanted to tell you about environmental problems.`,
+            blanks: [
+                { id: 1, answer: "important", context: "Environmental problems are becoming more and more [1] today." },
+                { id: 2, answer: "threaten", context: "can [2] their lives and the future of the planet." },
+                { id: 3, answer: "ecology", context: "a lot of us really care about [3]." },
+                { id: 4, answer: "pollution", context: "the main ecological problem in the place where I live is [4]." },
+                { id: 5, answer: "suffers", context: "My town [5] from different kinds of pollution." },
+                { id: 6, answer: "rubbish", context: "there is a lot of [6] in the streets." },
+                { id: 7, answer: "waste", context: "a lot of [7] is dumped into the rivers." },
+                { id: 8, answer: "improve", context: "young people can do a lot to [8] the ecological situation" },
+                { id: 9, answer: "active", context: "if they become more [9]." },
+                { id: 10, answer: "plant", context: "they can [10] trees and help to clean parks" }
+            ]
+        };
+
+        const wordBankWords = ["important", "threaten", "ecology", "pollution", "suffers", "rubbish", "waste", "improve", "active", "plant", "climate", "cars", "projects", "forests"];
+
         let mediaRecorder = null, audioChunks = [], audioBlob = null, audioBase64 = '', micStream = null;
         let recognition = null;
         let finalTranscript = '';
+        let recordTimeLeft = 0, maxRecordTime = 120, recordTimerInterval = null;
 
         // Инициализация распознавания речи
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -269,7 +360,7 @@
                 container.appendChild(star);
             }
         }
-        window.addEventListener('DOMContentLoaded', createStars);
+        window.addEventListener('DOMContentLoaded', () => { createStars(); initTask1(); });
 
         function showSection(id) {
             document.querySelectorAll('.welcome-form, .task-section').forEach(el => { el.style.display = 'none'; el.classList.remove('show'); });
@@ -279,7 +370,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function goToTopics() {
+        function goToTask1() {
             studentName = document.getElementById('studentName').value.trim();
             if (!studentName) {
                 const input = document.getElementById('studentName');
@@ -288,44 +379,115 @@
                 alert('Пожалуйста, введи своё имя! 🌟');
                 return;
             }
-            renderTopics();
-            showSection('topicSection');
+            showSection('task1Section');
         }
 
-        function renderTopics() {
-            const container = document.getElementById('topicsContainer');
-            container.innerHTML = '';
-            ogeTopics.forEach(topic => {
-                const card = document.createElement('div');
-                card.className = 'topic-card';
-                card.innerHTML = `<h3>${topic.title}</h3><ul>${topic.plan.map(point => `<li>${point}</li>`).join('')}</ul>`;
-                card.onclick = () => selectTopic(topic, card);
-                container.appendChild(card);
+        // Инициализация задания 1
+        function initTask1() {
+            const wordBank = document.getElementById('wordBank');
+            const monologueText = document.getElementById('monologueText');
+            
+            // Создаем банк слов (перемешанный)
+            const shuffledWords = [...wordBankWords].sort(() => Math.random() - 0.5);
+            wordBank.innerHTML = '';
+            shuffledWords.forEach(word => {
+                const span = document.createElement('span');
+                span.className = 'word-bank-item';
+                span.textContent = word;
+                span.dataset.word = word;
+                span.onclick = () => selectWord(span);
+                wordBank.appendChild(span);
             });
+
+            // Создаем текст с пропусками
+            let html = monologueData.text;
+            monologueData.blanks.forEach(blank => {
+                const regex = new RegExp(`\\[${blank.id}\\]`, 'g');
+                html = html.replace(regex, `<input type="text" class="blank-input" data-blank-id="${blank.id}" data-answer="${blank.answer}" readonly onclick="selectBlank(this)">`);
+            });
+            monologueText.innerHTML = html;
         }
 
-        function selectTopic(topic, cardElement) {
-            selectedTopic = topic;
-            document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('selected'));
-            cardElement.classList.add('selected');
-            document.getElementById('btnToPrep').disabled = false;
+        function selectWord(element) {
+            if (element.classList.contains('used')) return;
+            document.querySelectorAll('.word-bank-item').forEach(el => el.style.outline = 'none');
+            element.style.outline = '2px solid var(--primary)';
+            selectedBlank = { element: element, word: element.dataset.word };
         }
 
-        function goToPreparation() {
-            document.getElementById('prepTopicTitle').textContent = selectedTopic.title;
-            showSection('prepSection');
-            prepTimeLeft = 90;
-            updateTimerDisplay('prepTimer', prepTimeLeft);
-            prepTimerInterval = setInterval(() => {
-                prepTimeLeft--;
-                updateTimerDisplay('prepTimer', prepTimeLeft);
-                if (prepTimeLeft <= 0) { clearInterval(prepTimerInterval); skipPrep(); }
-            }, 1000);
+        function selectBlank(input) {
+            if (!selectedBlank) {
+                alert('Сначала выбери слово из списка выше! 👆');
+                return;
+            }
+            input.value = selectedBlank.word;
+            selectedBlank.element.classList.add('used');
+            selectedBlank.element.style.outline = 'none';
+            selectedBlank = null;
         }
 
-        function skipPrep() {
-            clearInterval(prepTimerInterval);
-            showSection('recordSection');
+        function checkBlanks() {
+            const inputs = document.querySelectorAll('.blank-input');
+            let correct = 0;
+            let total = inputs.length;
+            let allFilled = true;
+
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = input.dataset.answer.toLowerCase();
+                
+                if (!userAnswer) {
+                    allFilled = false;
+                    return;
+                }
+
+                if (userAnswer === correctAnswer) {
+                    input.classList.remove('wrong');
+                    input.classList.add('correct');
+                    correct++;
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('wrong');
+                }
+            });
+
+            const resultDiv = document.getElementById('checkResult');
+            if (!allFilled) {
+                resultDiv.className = 'check-result error';
+                resultDiv.innerHTML = '⚠️ Заполни все пропуски перед проверкой!';
+                return;
+            }
+
+            if (correct === total) {
+                resultDiv.className = 'check-result success';
+                resultDiv.innerHTML = `✨ <b>Отлично!</b> Все ${total} слов вставлены правильно! Можешь переходить к заданию 2.`;
+                task1Completed = true;
+                document.getElementById('btnToTask2').disabled = false;
+            } else {
+                resultDiv.className = 'check-result error';
+                resultDiv.innerHTML = `💫 Правильно: ${correct} из ${total}. Попробуй ещё раз! Красные поля — неправильные.`;
+            }
+        }
+
+        function resetBlanks() {
+            document.querySelectorAll('.blank-input').forEach(input => {
+                input.value = '';
+                input.classList.remove('correct', 'wrong');
+            });
+            document.querySelectorAll('.word-bank-item').forEach(item => {
+                item.classList.remove('used');
+                item.style.outline = 'none';
+            });
+            document.getElementById('checkResult').style.display = 'none';
+            selectedBlank = null;
+        }
+
+        function goToTask2() {
+            if (!task1Completed) {
+                alert('Сначала правильно выполни задание 1! 📝');
+                return;
+            }
+            showSection('task2Section');
         }
 
         function updateTimerDisplay(elementId, seconds) {
@@ -342,7 +504,6 @@
             try {
                 micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 
-                // Используем стандартный MediaRecorder (который работал)
                 mediaRecorder = new MediaRecorder(micStream);
                 audioChunks = [];
                 finalTranscript = '';
@@ -358,10 +519,9 @@
                     const audioPlayer = document.getElementById('audioPlayer');
                     audioPlayer.src = audioUrl;
                     
-                    // Настройка кнопки скачивания
                     const downloadBtn = document.getElementById('downloadBtn');
                     downloadBtn.href = audioUrl;
-                    downloadBtn.download = `${studentName.replace(/\s+/g, '_')}_OGE_Speaking.webm`;
+                    downloadBtn.download = `${studentName.replace(/\s+/g, '_')}_OGE_Ecology.webm`;
                     
                     const reader = new FileReader();
                     reader.readAsDataURL(audioBlob);
@@ -374,7 +534,6 @@
 
                 mediaRecorder.start();
                 
-                // Запуск распознавания речи
                 if (recognition) {
                     try { recognition.start(); } catch(e) { console.log("Recognition already started"); }
                 }
@@ -438,19 +597,24 @@
             let issues = [];
 
             if (wordCount < 80) issues.push("⚠️ <b>Малый объем:</b> Монолог слишком короткий (менее 80 слов). Постарайся раскрыть все пункты плана подробнее.");
-            else if (wordCount > 200) issues.push("⚠️ <b>Превышение объема:</b> Монолог слишком длинный. Старайся укладываться в 10-15 предложений.");
+            else if (wordCount > 200) issues.push("⚠️ <b>Превышение объема:</b> Монолог слишком длинный. Старайся укладываться в 10-12 предложений.");
 
-            const foundKeywords = selectedTopic.keywords.filter(kw => text.includes(kw));
+            const ecologyKeywords = ["environmental", "problems", "pollution", "ecology", "ecological", "climate", "planet", "nature"];
+            const foundKeywords = ecologyKeywords.filter(kw => text.includes(kw));
             if (foundKeywords.length < 2) {
-                issues.push(`⚠️ <b>Лексика:</b> Не найдены ключевые слова темы. Попробуй использовать слова, связанные с темой "${selectedTopic.title}".`);
+                issues.push(`⚠️ <b>Лексика:</b> Не найдены ключевые слова по теме экологии. Попробуй использовать слова: environmental problems, pollution, ecology.`);
             }
 
-            if (text.includes(" i ") && !text.includes(" i am ") && !text.includes(" i have ") && !text.includes(" i think ")) {
-                issues.push("💡 <b>Грамматика:</b> Проверь использование местоимения 'I'. Оно всегда пишется с большой буквы, а после него обычно идет глагол (I am, I think, I have).");
+            if (!text.includes("i am going to give a talk")) {
+                issues.push("💡 <b>Структура:</b> Не забудь начать монолог фразой: <i>'I am going to give a talk about environmental problems.'</i>");
+            }
+
+            if (!text.includes("that's all")) {
+                issues.push("💡 <b>Структура:</b> Не забудь завершить монолог фразой: <i>'That's all that I wanted to tell you.'</i>");
             }
 
             if (issues.length === 0) {
-                analysisBox.innerHTML = "✨ <b>Отличная работа!</b> Предварительный анализ не выявил грубых ошибок. Объем и лексика соответствуют теме.";
+                analysisBox.innerHTML = "✨ <b>Отличная работа!</b> Предварительный анализ не выявил грубых ошибок. Объем и лексика соответствуют заданию.";
                 analysisBox.style.background = "var(--success-bg)";
                 analysisBox.style.borderLeftColor = "var(--success)";
                 analysisBox.style.color = "#86efac";
@@ -469,12 +633,12 @@
             try {
                 const payload = {
                     student_name: studentName,
-                    exercise_name: "OGE Speaking Monologue",
-                    topic: selectedTopic.title,
+                    exercise_name: "OGE Speaking: Environmental Problems",
+                    task1_completed: task1Completed ? "Yes" : "No",
                     recording_duration_seconds: recordTimeLeft,
                     timestamp: new Date().toLocaleString('ru-RU'),
-                    transcript_text: finalTranscript.trim() || "Распознавание не удалось (возможно, браузер не поддерживает Web Speech API).",
-                    preliminary_issues: document.getElementById('preliminaryAnalysis').innerText,
+                    transcript_text: finalTranscript.trim() || "Распознавание не удалось.",
+                    preliminary_analysis: document.getElementById('preliminaryAnalysis').innerText,
                     audio_base64: audioBase64,
                     audio_format: "webm"
                 };
